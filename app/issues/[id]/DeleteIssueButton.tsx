@@ -1,40 +1,78 @@
 'use client';
 
-import { AlertDialog, AlertDialogDescription, AlertDialogTrigger, Button, Flex } from '@radix-ui/themes';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTrigger,
+  Button,
+  Flex,
+} from '@radix-ui/themes';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface Props {
   issueId: number;
 }
 
 const DeleteIssueButton = ({ issueId }: Props) => {
-const router = useRouter();
+  const router = useRouter();
+  const [error, setError] = useState(false);
+
+  const deleteIssue = async () => {
+    try {
+      await axios.delete('/api/issues/' + issueId);
+      router.push('/issues');
+      router.refresh();
+    } catch (error) {
+      setError(true);
+    }
+  };
 
   return (
-    <AlertDialog.Root>
-      <AlertDialogTrigger>
-        <Button color="red">Delete Issue</Button>
-      </AlertDialogTrigger>
-      <AlertDialog.Content>
-        <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
-        <AlertDialogDescription>
-            Are you sure you want to delete this issue? This action cannot be undone.
-        </AlertDialogDescription>
-        <Flex mt="4" gap="3">
+    <>
+      <AlertDialog.Root>
+        <AlertDialogTrigger>
+          <Button color="red">Delete Issue</Button>
+        </AlertDialogTrigger>
+        <AlertDialog.Content>
+          <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
+          <AlertDialogDescription>
+            Are you sure you want to delete this issue? This action cannot be
+            undone.
+          </AlertDialogDescription>
+          <Flex mt="4" gap="3">
             <AlertDialog.Cancel>
-                <Button variant="soft" color='gray'>Cancel</Button>
+              <Button variant="soft" color="gray">
+                Cancel
+              </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action>
-                <Button color='red' onClick={async() => {
-                  await axios.delete('/api/issues/' + issueId);
-                  router.push('/issues');
-                  router.refresh()
-                }}>Delete Issue</Button>
+              <Button color="red" onClick={deleteIssue}>
+                Delete Issue
+              </Button>
             </AlertDialog.Action>
-        </Flex>
-      </AlertDialog.Content>
-    </AlertDialog.Root>
+          </Flex>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
+      <AlertDialog.Root open={error}>
+        <AlertDialog.Content>
+          <AlertDialog.Title>Error</AlertDialog.Title>
+          <AlertDialog.Description>
+            This issue could not be deleted.
+          </AlertDialog.Description>
+          <Button
+            color="gray"
+            variant="soft"
+            mt="2"
+            onClick={() => setError(false)}
+          >
+            OK
+          </Button>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
+    </>
   );
 };
 
