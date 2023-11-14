@@ -1,5 +1,6 @@
 'use client';
 
+import { Spinner } from '@/app/components';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -19,13 +20,16 @@ interface Props {
 const DeleteIssueButton = ({ issueId }: Props) => {
   const router = useRouter();
   const [error, setError] = useState(false);
+  const [isDeleleting, setDeleting] = useState(false);
 
   const deleteIssue = async () => {
     try {
+      setDeleting(true);
       await axios.delete('/api/issues/' + issueId);
       router.push('/issues');
       router.refresh();
     } catch (error) {
+      setDeleting(false);
       setError(true);
     }
   };
@@ -34,7 +38,10 @@ const DeleteIssueButton = ({ issueId }: Props) => {
     <>
       <AlertDialog.Root>
         <AlertDialogTrigger>
-          <Button color="red">Delete Issue</Button>
+          <Button color="red" disabled={isDeleleting}>
+            Delete Issue
+            {isDeleleting && <Spinner/>}
+          </Button>
         </AlertDialogTrigger>
         <AlertDialog.Content>
           <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
