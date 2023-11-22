@@ -19,8 +19,9 @@ const IssueDetailPage = async ({ params }: Props) => {
     where: { id: parseInt(params.id) },
   });
 
-  if (!issue) notFound();
-
+  if (!issue) {
+    notFound();
+  }
   return (
     <Grid columns={{ initial: '1', sm: '5' }} gap="5">
       <Box className="md:col-span-4">
